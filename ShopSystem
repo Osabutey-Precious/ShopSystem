@@ -1,0 +1,257 @@
+import java.util.Scanner;
+
+public class ShopSystem {
+    // Prices of items
+    static double shirtPrice = 50.0;
+    static double mugPrice = 41.25;
+    static double shoePrice = 179.58;
+    static double watchPrice = 300.0;
+
+    // Initial stock levels of items
+    static int shirtsStock = 30;
+    static int mugsStock = 44;
+    static int shoesStock = 89;
+    static int watchesStock = 97;
+
+    // Total money realized from sales
+    static double totalMoneyRealized = 0.0;
+
+    public static void main(String[] args) {
+        // Entry point of the program
+        run();
+    }
+
+    // Main program loop
+    static void run() {
+        while (true) {
+            // Display the main menu
+            displayMenu();
+
+            // Get user's choice
+            int choice = getUserChoice();
+
+            // Perform actions based on user's choice
+            switch (choice) {
+                case 1 -> sellItem();
+                case 2 -> computeStockLevels();
+                case 3 -> restockItem();
+                case 4 -> displaySummary();
+                case 5 -> {
+                    System.out.println("\n\tExiting program. \n\t\033[1;36mHave a nice day!\033[0m");
+                    System.exit(0);
+                }
+                default -> System.out.println("\n\tInvalid choice. Please try again.");
+            }
+        }
+    }
+
+    // Display the main menu options
+    static void displayMenu() {
+        System.out.println("\n\t\033[37m****\033[0m \033[1;36mAdina's Shop Management System\033[0m \033[37m****\033[0m");
+        System.out.println("\t1. Sell Item");
+        System.out.println("\t2. Check Stock Levels");
+        System.out.println("\t3. Restock Item");
+        System.out.println("\t4. Display Summary");
+        System.out.println("\t5. Exit");
+    }
+
+    // Get user's choice from the menu
+    static int getUserChoice() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("\n\tWhat do we do today, \033[1;36mAdina?\033[0m (1-5): ");
+
+        return getValidInput(scanner);
+    }
+
+    // Helper method to get valid integer input
+    static int getValidInput(Scanner scanner) {
+        if (scanner.hasNextInt()) {
+            return scanner.nextInt();
+        } else {
+            System.out.print("\n\tInvalid input. Please enter a nu1" +
+                    "mber : ");
+            scanner.nextLine(); // Clear the input buffer
+            return getValidInput(scanner); // Recursively call the method until valid input is received
+        }
+    }
+    // Sell an item to the user
+    static void sellItem() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n\t\033[1;36m 1. Sell Item \033[0m ");
+        System.out.println("\t\033[0;37m---------------------------------------------------------------------------\033[0m");
+        System.out.println("\t \033[1mItem ID\033[0m  \033[37m|\033[0m  \033[1mItem Name\033[0m         \033[37m|\033[0m  \033[1mItem Price (GHC)\033[0m  \033[37m|\033[0m  \033[1mCurrent Quantity\033[0m");
+        System.out.println("\t\033[0;37m---------------------------------------------------------------------------\033[0m");
+        System.out.println("\t 1        \033[37m|\033[0m  Shirts            \033[37m|\033[0m  50                \033[37m|\033[0m  " + shirtsStock);
+        System.out.println("\t 2        \033[37m|\033[0m  Mugs              \033[37m|\033[0m  41.25             \033[37m|\033[0m  " + mugsStock);
+        System.out.println("\t 3        \033[37m|\033[0m  Shoes             \033[37m|\033[0m  179.58            \033[37m|\033[0m  " + shoesStock);
+        System.out.println("\t 4        \033[37m|\033[0m  Ladies Watches    \033[37m|\033[0m  300               \033[37m|\033[0m  " + watchesStock);
+        System.out.println("\t\033[0;37m---------------------------------------------------------------------------\033[0m");
+
+        int itemNumber;
+
+        // Continue prompting until a valid item number is entered
+        do {
+            System.out.print("\n\tEnter item ID to sell: ");
+            itemNumber = getValidInput(scanner);
+
+            // Check if the item number is valid
+            if (itemNumber < 1 || itemNumber > 4) {
+                System.out.println("\n\tInvalid item number. Please enter a number between 1 and 4.");
+            }
+        } while (itemNumber < 1 || itemNumber > 4);
+
+        System.out.print("\tEnter quantity to sell: ");
+        int quantity = getValidInput(scanner);
+
+        // Process the sale based on the selected item
+        switch (itemNumber) {
+            case 1:
+                processSale("Shirts", shirtPrice, quantity, shirtsStock);
+                break;
+            case 2:
+                processSale("Mugs", mugPrice, quantity, mugsStock);
+                break;
+            case 3:
+                processSale("Shoes", shoePrice, quantity, shoesStock);
+                break;
+            case 4:
+                processSale("Ladies Watches", watchPrice, quantity, watchesStock);
+                break;
+            default:
+                System.out.println("\n\tInvalid item number. Sale cancelled.");
+                break;
+        }
+    }
+
+    // Process the sale of an item
+    static void processSale(String itemName, double itemPrice, int quantity, int stock) {
+        // If the requested quantity exceeds the stock, sell the maximum available quantity
+        if (quantity > stock) {
+            System.out.println("\n\tNot enough stock available. Selling maximum available quantity.");
+            quantity = stock;
+        }
+
+        // Calculate the total price of the sale
+        double totalPrice = itemPrice * quantity;
+        // Update the total money realized
+        totalMoneyRealized += totalPrice;
+
+        // Display the sale details
+        System.out.println("\n\tSold " + quantity + " " + itemName + " for GHc \033[1;36m" + totalPrice + "\033[0m");
+        // Update the stock after the sale
+        updateStock(itemName, quantity, false);
+    }
+
+    // Check and display the stock levels of items
+    static void computeStockLevels() {
+        System.out.println("\n\t\033[1;36m 2. Check Stock Levels \033[0m ");
+        System.out.println("\t\033[0;37m-------------------------------------------------------------\033[0m");
+        System.out.println("\t \033[1mItem ID\033[0m  \033[37m|\033[0m  \033[1mItem Name\033[0m         \033[37m|\033[0m  \033[1mQuantity in Stock\033[0m ");
+        System.out.println("\t\033[0;37m-------------------------------------------------------------\033[0m");
+        System.out.println("\t 1        \033[37m|\033[0m  Shirts            \033[37m|\033[0m  " + shirtsStock);
+        System.out.println("\t 2        \033[37m|\033[0m  Mugs              \033[37m|\033[0m  " + mugsStock);
+        System.out.println("\t 3        \033[37m|\033[0m  Shoes             \033[37m|\033[0m  " + shoesStock);
+        System.out.println("\t 4        \033[37m|\033[0m  Ladies Watches    \033[37m|\033[0m  " + watchesStock);
+        System.out.println("\t\033[0;37m-------------------------------------------------------------\033[0m");
+    }
+
+    // Restock an item
+    static void restockItem() {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("\n\t\033[1;36m 3. Restock Items \033[0m ");
+        System.out.println("\t\033[0;37m-----------------------------------\033[0m");
+        System.out.println("\t \033[1mItem ID\033[0m  \033[37m|\033[0m  \033[1mItem Name\033[0m         ");
+        System.out.println("\t\033[0;37m-----------------------------------\033[0m");
+        System.out.println("\t 1        \033[37m|\033[0m  Shirts            ");
+        System.out.println("\t 2        \033[37m|\033[0m  Mugs              ");
+        System.out.println("\t 3        \033[37m|\033[0m  Shoes             ");
+        System.out.println("\t 4        \033[37m|\033[0m  Ladies Watches    ");
+        System.out.println("\t\033[0;37m-----------------------------------\033[0m");
+
+        int itemNumber;
+
+        // Continue prompting until a valid item number is entered
+        do {
+            System.out.print("\n\tEnter item ID to restock: ");
+            itemNumber = getValidInput(scanner);
+
+            // Check if the item number is valid
+            if (itemNumber < 1 || itemNumber > 4) {
+                System.out.println("\n\tInvalid item number. Please enter a number between 1 and 4.");
+            }
+        } while (itemNumber < 1 || itemNumber > 4);
+
+        System.out.print("\tEnter quantity to restock: ");
+        int quantity = getValidInput(scanner);
+
+        // Update stock based on the selected item
+        switch (itemNumber) {
+            case 1:
+                updateStock("Shirts", quantity, true);
+                break;
+            case 2:
+                updateStock("Mugs", quantity, true);
+                break;
+            case 3:
+                updateStock("Shoes", quantity, true);
+                break;
+            case 4:
+                updateStock("Ladies Watches", quantity, true);
+                break;
+            default:
+                System.out.println("\n\tInvalid item number. Restocking cancelled.");
+                break;
+        }
+    }
+
+
+    // Update the stock of an item
+    static void updateStock(String itemName, int quantity, boolean isRestock) {
+        // Display the restock or sale information
+        if (isRestock) {
+            System.out.println("\n\tRestocked " + quantity + " " + itemName);
+            // Update stock levels based on the item
+            switch (itemName) {
+                case "Shirts":
+                    shirtsStock += quantity;
+                    break;
+                case "Mugs":
+                    mugsStock += quantity;
+                    break;
+                case "Shoes":
+                    shoesStock += quantity;
+                    break;
+                case "Ladies Watches":
+                    watchesStock += quantity;
+                    break;
+            }
+        } else {
+            System.out.println("\tUpdated stock after sale: " + itemName + " -" + quantity);
+            // Update stock levels based on the item
+            switch (itemName) {
+                case "Shirts":
+                    shirtsStock -= quantity;
+                    break;
+                case "Mugs":
+                    mugsStock -= quantity;
+                    break;
+                case "Shoes":
+                    shoesStock -= quantity;
+                    break;
+                case "Ladies Watches":
+                    watchesStock -= quantity;
+                    break;
+            }
+        }
+    }
+
+
+    // Display the summary of total money realized and stock levels
+    static void displaySummary() {
+        System.out.println("\n\t\033[1;36m 4. Summary \033[0m ");
+        System.out.println("\tTotal money realized: GHc \033[1;36m" + totalMoneyRealized + "\033[0m");
+        computeStockLevels();
+    }
+}
